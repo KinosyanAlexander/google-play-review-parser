@@ -1,1 +1,6 @@
+pytest.ini
+/.pytest_cashe
+
+*.db
+
 node_modules
