@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 import re
 
+from typing import Optional, List
 
-def clear_request_data(text):
+def clear_request_data(text: str) -> str:
     '''
     Clear text from post request,
     that help to make list from text
@@ -21,7 +22,7 @@ def clear_request_data(text):
     return text
 
 
-def make_request_data(text):
+def make_request_data(text: str) -> Optional[List]:
     '''
     Make reviews list from cleared text
     '''
@@ -37,7 +38,7 @@ def make_request_data(text):
     return data
 
 
-def get_token_from_text(text):
+def get_token_from_text(text: str) -> Optional[str]:
     '''
     Extract token from no-cleared text
     Using if request text is not valid
