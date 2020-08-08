@@ -36,6 +36,7 @@ class Reviews():
         self.token = start_token
         self.sqlbase = sqlbase
         self.data = []
+        self.token_filename = 'token.txt'
 
         self.url = Url.API_URL.format(lang=self.lang)
 
@@ -96,24 +97,19 @@ class Reviews():
         '''
         Formatting post data to make request
         '''
-        if self.score is None:
-            self.score = 'null'
-        if self.sort is None:
-            self.sort = 'null'
-
         if is_start:
             self.post_data = PostData.POST_DATA_FOR_FIRST_REQUEST.format(
-                sort=self.sort,
+                sort=self.sort if self.sort else 'null',
                 count=self.count,
-                score=self.score,
+                score=self.score if self.score else 'null',
                 app_id=self.app_id
             )
         else:
            self.post_data = PostData.POST_DATA_FOR_PAGINATED_PAGE.format(
-                sort=self.sort,
+                sort=self.sort if self.sort else 'null',
                 count=self.count,
                 token=self.token,
-                score=self.score,
+                score=self.score if self.score else 'null',
                 app_id=self.app_id
             )
         return self.post_data
@@ -164,8 +160,11 @@ class Reviews():
             print('Sql Base not exists')
             return False
     
-    def write_last_token(self) -> None:
-        with open('token.txt', 'w', encoding='utf-8') as f:
+    def write_last_token(self, filename: str='token.txt') -> None:
+        '''
+        Write actual token to token.txt by default or other filename
+        '''
+        with open(filename, 'w', encoding='utf-8') as f:
             print(self.token, file=f)
 
     def make_review(self, element: List) -> Optional[Review]:
@@ -227,11 +226,12 @@ class Reviews():
             except UnicodeEncodeError:
                 print('Problem with data coding')
                 pass
+        else:
+            self.data += reviews
 
         if len(self.data) >= self.all_count:
             self.play_parsing = False
             print(f'All {len(self.data)} reviews parsed')
-            return self.data
 
         try:
             self.token = data[1][1]
@@ -253,8 +253,8 @@ class Reviews():
         '''
         self.play_parsing = True
         while self.play_parsing:
-            self.write_last_token()
             self.take_some_reviews()
+            self.write_last_token(filename=self.token_filename)
         
         self.token = None
         return self.data
