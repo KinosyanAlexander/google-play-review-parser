@@ -70,22 +70,21 @@ class TestScore:
         
         assert all(data)
 
-class TestBigData:
-    reviews = Reviews('org.telegram.messenger', start_token=None, lang='en', sqlbase='telegram_large_base_2.db')
+# class TestBigData:
+#     reviews = Reviews('ru.sberbankmobile', start_token=None, lang='ru', sqlbase='ru_sberbank_large_base.db')
 
-    def test_count_1m(self):
-        # self.reviews.refresh()
-        self.reviews.change_count(1 * (10 ** 6))
-        try:
-            data = self.reviews.get_reviews()
-        except Exception as e:
-            print(self.reviews.token)
-            print(e)
-            data = []
+#     def test_count_1m(self):
+#         # self.reviews.refresh()
+#         self.reviews.change_count(1 * (10 ** 6))
+#         try:
+#             data = self.reviews.get_reviews()
+#         except Exception as e:
+#             print(self.reviews.token)
+#             print(e)
+#             data = []
 
-        assert len(data) == (1 * (10 ** 6))
+#         assert len(data) == (1 * (10 ** 6))
 
 
 if __name__ == "__main__":
-    h = TestBigData()
-    h.test_count_1m()
+    pass
