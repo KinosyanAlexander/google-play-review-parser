@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 import time
 
+from typing import Union, Optional, List
+from time import struct_time
+
 
 class Review():
     '''
@@ -9,12 +12,12 @@ class Review():
     main info about review
     '''
     def __init__(self,
-                nickname,
-                review_text,
-                score,
-                likes,
-                date
-                ):
+                nickname: str,
+                review_text: str,
+                score: int,
+                likes: int,
+                date: Union[struct_time, str]
+                ) -> None:
         self.nick = nickname
         self.text = review_text
         self.score = score
@@ -24,7 +27,7 @@ class Review():
     def __repr__(self):
         return f'<Review\n nick: {self.nick}\n text: {self.text}\n score: {self.score}\n likes: {self.likes}\n date: {self.date}\n>'
 
-    def get_list(self, for_base=False):
+    def get_list(self, for_base: bool=False) -> Optional[List[str, str, int, int, str]]:
         '''
         return list of review parameters
         if flag "for_base" is True,
@@ -40,6 +43,7 @@ class Review():
             date = self.date
 
         return [self.nick, self.text, self.score, self.likes, date]
+
 
 if __name__ == "__main__":
     pass
