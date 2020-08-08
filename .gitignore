@@ -2,5 +2,8 @@ pytest.ini
 /.pytest_cashe
 
 *.db
+*.txt
+
+template.py
 
 node_modules
