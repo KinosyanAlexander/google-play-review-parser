@@ -5,12 +5,14 @@ import time
 import re
 import sqlite3 as sq
 
+from typing import Union, List, Optional
+from requests.models import Response
+
 from google_play_reviews_parser.constants import Url, PostData
 from google_play_reviews_parser.utils import make_request_data, Review, get_token_from_text
 
 # from constants import Url, PostData
 # from utils import make_request_data, clear_request_data, Review, get_token_from_text
-
 
 
 class Reviews():
@@ -19,13 +21,13 @@ class Reviews():
     and write reviews in sqlite base
     '''
     def __init__(self,
-                app_id,
-                lang='ru',
-                count=1,
-                score='null',
-                sort='null',
-                start_token=None,
-                sqlbase=None):
+                app_id: str,
+                lang: str = 'ru',
+                count: int = 1,
+                score: Union[int, List[int], None] = None,
+                sort: Optional[str] = None,
+                start_token: Optional[str] = None,
+                sqlbase: Optional[str] = None) -> None:
         self.app_id = app_id
         self.lang = lang
         self.change_count(count)
@@ -44,7 +46,7 @@ class Reviews():
         if self.sqlbase:
             self.create_base()
     
-    def change_count(self, count):
+    def change_count(self, count: int) -> None:
         '''
         Change count of reviews
         '''
@@ -53,7 +55,7 @@ class Reviews():
         if not self.count:
             self.count = 199
     
-    def refresh(self):
+    def refresh(self) -> None:
         '''
         Restart info about Review
         '''
@@ -66,14 +68,14 @@ class Reviews():
         if self.sqlbase:
             self.create_base()
     
-    def change_lang(self, lang):
+    def change_lang(self, lang: str) -> None:
         '''
         Change reviews language
         '''
         self.lang = lang
         self.url = Url.API_URL.format(lang=self.lang)
     
-    def request(self):
+    def request(self) -> Optional[Response]:
         '''
         Make post request to take reviews
         '''
@@ -90,7 +92,7 @@ class Reviews():
             except RecursionError:
                 return None
 
-    def format_post_data(self, is_start=False):
+    def format_post_data(self, is_start: bool=False) -> str:
         '''
         Formatting post data to make request
         '''
@@ -116,14 +118,14 @@ class Reviews():
             )
         return self.post_data
     
-    def extract_request_data(self, request):
+    def extract_request_data(self, request: Response) -> Optional[List]:
         '''
         Extracting reviews data from post request from self.request()
         '''
         data = make_request_data(request.text)
         return data
     
-    def create_base(self, filename=''):
+    def create_base(self, filename: str='') -> None:
         '''
         Create Sqlite db for reviews
         '''
@@ -144,7 +146,7 @@ class Reviews():
         
         self.conn.commit()
     
-    def add_reviews_to_base(self, data):
+    def add_reviews_to_base(self, data: List[Review]) -> bool:
         '''
         Adding reviews from data (=> List of Review) to sqlite base
         if base exists
@@ -161,8 +163,12 @@ class Reviews():
         except AttributeError:
             print('Sql Base not exists')
             return False
+    
+    def write_last_token(self) -> None:
+        with open('token.txt', 'w', encoding='utf-8') as f:
+            print(self.token, file=f)
 
-    def make_review(self, element):
+    def make_review(self, element: List) -> Optional[Review]:
         '''
         Make Review() object from review info data
         '''
@@ -178,7 +184,7 @@ class Reviews():
 
         return review
 
-    def take_some_reviews(self):
+    def take_some_reviews(self) -> Union[None, List, str]:
         '''
         Func, that allow ONE request parsing
         '''
@@ -240,13 +246,14 @@ class Reviews():
             if (self.all_count - self.count) % 199:
                 self.count = 199
     
-    def get_reviews(self):
+    def get_reviews(self) -> List[Review]:
         '''
         Main func, that allow MANY requests parsing
         and fill self.data for reviews for self.all_count count
         '''
         self.play_parsing = True
         while self.play_parsing:
+            self.write_last_token()
             self.take_some_reviews()
         
         self.token = None
